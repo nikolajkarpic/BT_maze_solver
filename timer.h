@@ -1,5 +1,9 @@
 #include<p30fxxxx.h>
 
+#include "variables.h"
+#include "uart.h"
+#include "movement.h"
+
 #define TMR1_period 10 /*  Fosc = 10MHz,
 					          //1/Fosc = 0.1us !!!, 0.1us * 10 = 1us  */
 #define TMR3_period 58800 /*  Fosc = 10MHz,

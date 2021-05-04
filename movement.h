@@ -1,4 +1,6 @@
-//void set_speed(unsigned int percent);
+#include "variables.h"
+#include "timer.h"
+#include "uart.h"
 
 void check_direction();
 
