@@ -1,5 +1,10 @@
 #include "timer.h"
 
+void set_speed(unsigned int percent){
+    unsigned int temp = 780*percent;
+    temp/=100;
+    motor_speed = temp;
+}
 
 void Init_T1(void)
 {

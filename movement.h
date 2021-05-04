@@ -1,4 +1,4 @@
-void set_speed(unsigned int percent);
+//void set_speed(unsigned int percent);
 
 void check_direction();
 

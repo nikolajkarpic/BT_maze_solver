@@ -10,6 +10,8 @@
 
 //unsigned int stoperica = 0;
 
+void set_speed(unsigned int percent);
+
 void Init_T1(void);
 
 void Init_T2(void);
