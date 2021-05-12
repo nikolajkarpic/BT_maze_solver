@@ -1,5 +1,7 @@
 #include "timer.h"
 
+unsigned int stoperica;
+
 void set_speed(unsigned int percent){
     unsigned int temp = 780*percent;
     temp/=100;
@@ -75,28 +77,11 @@ void __attribute__ ((__interrupt__)) _T3Interrupt(void){ //svakih 6.5ms
     IFS0bits.T3IF = 0; 
 }
 
-void delay_us (int vreme)//funkcija za kasnjenje u milisekundama
-	{
+void delay_us (int vreme){//funkcija za kasnjenje u milisekundama
         T1CONbits.TON = 1;
 		stoperica = 0;
 		while(stoperica < vreme);
         T1CONbits.TON = 0;
-	}
-
-    unsigned int ultrasonic_sensor_right(){
-    unsigned int distance;
-    
-    TMR3=0;
-    LATBbits.LATB0=1;//triger=1
-    delay_us(10);
-    LATBbits.LATB0 = 0;
-    tmr3_counter = 0;
-    while(!PORTBbits.RB1);
-    T3CONbits.TON = 1;
-    while(PORTBbits.RB1);
-    T3CONbits.TON = 0;
-    
-    return TMR3/588 + tmr3_counter*100;
 }
 
 unsigned int ultrasonic_sensor_right(){

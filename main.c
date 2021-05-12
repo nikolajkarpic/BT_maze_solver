@@ -9,23 +9,10 @@
 // #include <stdio.h>
 // #include <stdlib.h>
 //#include<p30fxxxx.h>
-
-#include "timer.h"
-#include "uart.h"
 #include "movement.h"
-_FOSC(CSW_FSCM_OFF & XT_PLL4);//instruction takt je isti kao i kristal
-_FWDT(WDT_OFF);
 
 
-#define trig2 LATDbits.LATD0 
-#define echo2 PORTDbits.RD1
-#define trig1 LATBbits.LATB0
-#define echo1 PORTBbits.RB1
 
-#define M1_1 LATBbits.LATB3 
-#define M1_2 LATBbits.LATB4 
-#define M2_1 LATBbits.LATB5 
-#define M2_2 LATBbits.LATB6 
 
 unsigned int distance_fwd;
 unsigned int distance_right;
@@ -45,10 +32,107 @@ unsigned int prefered_distance_right = 17;
 unsigned int hysteresis_fwd = 5;
 unsigned int hysteresis_right = 1;
 
-enum tank_state{ idle_s, fwd_s, left_s, right_s, bck_s} current_state;
-tank_state next_state;
+
 
 unsigned int brojac_desno = 0, br;
+
+
+
+
+_FOSC(CSW_FSCM_OFF & XT_PLL4);//instruction takt je isti kao i kristal
+_FWDT(WDT_OFF);
+
+
+
+
+enum tank_state{ idle_s, fwd_s, left_s, right_s, bck_s} current_state, next_state;
+
+
+void check_direction(){ //kontrola H mosta za smer motora
+
+    
+    if(fwd == 1){ //1010 je za smer napred
+        M1_1 = 1;
+        M1_2 = 0;
+        M2_1 = 1;
+        M2_2 = 0;
+        
+        return 0;
+    }
+    if(bck == 1){// 0101 je smer za nazad
+        M1_1 = 0;
+        M1_2 = 1;
+        M2_1 = 0;
+        M2_2 = 1;
+        
+        return 0;
+    }
+    
+    if(left == 1){//Smer za levo je 1001
+        M1_1 = 1;
+        M1_2 = 0;
+        M2_1 = 0;
+        M2_2 = 1;
+        
+        return 0;
+    }if(right == 1){ //smer za desno je 0110
+        M1_1 = 0;
+        M1_2 = 1;
+        M2_1 = 1;
+        M2_2 = 0;
+        
+        return 0;
+    }if(fwd_right == 1){
+        M1_1 = 0;
+        M1_2 = 0;
+        M2_1 = 1;
+        M2_2 = 0;
+        
+        return 0;
+    }if(fwd_left == 1){
+        M1_1 = 1;
+        M1_2 = 0;
+        M2_1 = 0;
+        M2_2 = 0;
+        
+        return 0;
+    }
+    
+    M1_1 = 0;//motori su ugaseni za 0000
+    M1_2 = 0;
+    M2_1 = 0;
+    M2_2 = 0;
+}
+
+
+void stop(){
+    fwd = 0;
+    bck = 0;
+    left = 0;
+    right = 0;
+    fwd_left = 0;
+    fwd_right = 0;
+}
+
+void check_obstacles(){
+    
+    
+    char buffer[20];
+    
+    distance_fwd = ultrasonic_sensor_fwd();
+    distance_right = ultrasonic_sensor_right();
+
+    sprintf(buffer, "desno: %dcm\n", distance_right);
+    WriteStringToUART1(buffer);
+
+    sprintf(buffer, "napred: %dcm\n", distance_fwd);
+    //WriteStringToUART1(buffer);
+
+    
+   // if(distance_right == 27 || distance_right == 28) fwd_right = 1;
+    
+    
+}
 
 
 void print_state(){
@@ -71,7 +155,7 @@ void print_state(){
             
     }
 }
-unsigned int br = 0;
+ unsigned int br = 0;
 
 int main(void) {
     
@@ -97,14 +181,14 @@ int main(void) {
     LATBbits.LATB5 = 0; //M2_1
     LATBbits.LATB6 = 0; //M2_2
             
-    state = idle_s;
+    next_state = idle_s;
     
     Init_T1();
     Init_T2();
     Init_T3();
     initUART1();
     set_speed(15);//brzina je 60%
-    unsigned int i;
+    extern unsigned int i;
     
     while(1){
         check_obstacles();
@@ -164,7 +248,7 @@ int main(void) {
                 break;
             case left_s:
                 stop();
-                left = 1;// treba fiksno vreme za rotaciju od 90 stepeni porm. unsigned int turning_time_left;
+                left = 1;// treba fiksno vreme za rotaciju od 90 stepeni porm. extern unsigned int turning_time_left;
                 check_direction();
                 while(!(distance_right <= prefered_distance_right + hysteresis_right && distance_right >= prefered_distance_right - hysteresis_right)){
                 //for (i = 0; i<turning_time_left; i++){
@@ -186,7 +270,7 @@ int main(void) {
                     delay_us(10000);
                 }
                 stop();
-                fwd_right = 1;// treba fiksno vreme za rotaciju od 90 stepeni porm. unsigned int turning_time_right;
+                fwd_right = 1;// treba fiksno vreme za rotaciju od 90 stepeni porm. extern unsigned int turning_time_right;
                 check_direction();
                 for (i = 0; i<turning_time_right; i++){
                     delay_us(10000);

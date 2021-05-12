@@ -1,8 +1,9 @@
-#include<p30fxxxx.h>
+#include "UART.h"
 
-#include "variables.h"
-#include "uart.h"
-#include "movement.h"
+#define trig2 LATDbits.LATD0 
+#define echo2 PORTDbits.RD1
+#define trig1 LATBbits.LATB0
+#define echo1 PORTBbits.RB1
 
 #define TMR1_period 10 /*  Fosc = 10MHz,
 					          //1/Fosc = 0.1us !!!, 0.1us * 10 = 1us  */
@@ -12,7 +13,7 @@
 #define servo_period 780 //sa preskalerom od 256 ova vrednost podesava frekvenciju pwm-a da bude 50Hz
 #define motor_speed OC4RS //output compare na pinu RD3
 
-//unsigned int stoperica = 0;
+// extern unsigned int stoperica;
 
 void set_speed(unsigned int percent);
 

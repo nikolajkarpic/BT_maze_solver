@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "variables.h"
-#include "timer.h"
-#include "movement.h"
+#include<p30fxxxx.h>
+
+//extern unsigned char tempRX;
 
 void initUART1(void);
 
